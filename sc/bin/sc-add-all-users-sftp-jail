@@ -1,0 +1,9 @@
+#!/bin/bash
+
+source /root/sc/config
+
+HOMEDIR=/home
+shells="/bin/sh"
+for user in $(grep "$HOMEDIR" /etc/passwd |egrep "$shells" |cut -f 1 -d:); do
+    "$bin_path"add-user-sftp-jail $user
+done

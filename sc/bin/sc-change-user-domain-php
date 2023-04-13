@@ -1,0 +1,62 @@
+#!/bin/bash
+
+source /root/sc/config
+user=$1
+domain=$2
+php_version=$3
+
+if [ -z $user ] || [ -z $domain ]; then
+	echo "Usage: change-user-domain-php [user] [domain] [php_version]";
+	exit
+fi
+
+user_str=$(grep /home /etc/passwd | grep "$user" |cut -f 1 -d:)
+
+if [ -z "$user_str" ] || [ "$user" != "$user_str" ]; then
+	echo "User not found";
+	exit
+fi
+
+if [ -z "$php_version" ];then
+	php_version="8.2"
+fi
+
+test_php=$(echo "$php_version" | egrep "$php_versions")
+
+if [ -z "$test_php" ];then
+	echo "Error: PHP $php_version not found"
+	exit
+fi
+
+nginx_conf_template="$templates_path"nginx.conf.template
+nginx_conf=/etc/nginx/sites-available/$domain
+fpm_conf_template="$templates_path"fpm.conf.template
+fpm_conf="/etc/php/$php_version/fpm/pool.d/$domain.conf"
+
+if [ ! -f "$nginx_conf" ];then
+	echo "Error: $domain not configured"
+	exit
+fi
+
+# detect php_version
+current_php_version=$(cat $nginx_conf | grep "/var/run/php" | cut -f 2 -d: | cut -f 5 -d/ | cut -f 1 -d- | egrep "$php_versions")
+
+if [ "$php_version" == "$current_php_version"];then
+	echo "Error: PHP version is the same"
+	exit
+fi
+
+"$bin_path"sc-change-user-domain-php $user $domain $php_version
+
+#domain_dir=/home/$user/web/$domain/
+#public_html="$domain_dir"public_html/
+
+#sed "s/%user%/${user}/g" $fpm_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $fpm_conf
+
+#sed "s/%user%/${user}/g" $nginx_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $nginx_conf
+#ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
+
+
+#systemctl restart nginx.service
+#service php$php_version-fpm restart
+

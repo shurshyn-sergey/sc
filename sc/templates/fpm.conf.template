@@ -1,0 +1,26 @@
+[%domain%]
+
+user = %user%
+group = %user%
+listen = /run/php/php%php%-fpm-%domain%.sock
+
+listen.owner = www-data
+listen.group = www-data
+
+pm = dynamic
+pm.max_children = 5
+pm.max_requests = 4000
+pm.process_idle_timeout = 10s
+
+php_admin_value[upload_tmp_dir] = /home/%user%/tmp
+php_admin_value[session.save_path] = /home/%user%/tmp
+
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+
+env[HOSTNAME] = $HOSTNAME
+env[PATH] = /usr/local/bin:/usr/bin:/bin
+env[TMP] = /home/%user%/tmp
+env[TMPDIR] = /home/%user%/tmp
+env[TEMP] = /home/%user%/tmp

@@ -1,0 +1,87 @@
+#!/bin/bash
+
+source /root/sc/config
+
+user=$1
+domain=$2
+php_version=$3
+
+if [ -z $user ] || [ -z $domain ]; then
+	echo "Usage: add-user-domain [user] [domain] [php_version]";
+	exit
+fi
+
+user_str=$(grep /home /etc/passwd | grep "$user" |cut -f 1 -d:)
+
+if [ -z "$user_str" ] || [ "$user" != "$user_str" ]; then
+	echo "User not found";
+	exit
+fi
+
+
+if [ -z "$php_version" ];then
+	php_version="8.2"
+fi
+
+
+test_php=$(echo "$php_version" | egrep "$php_versions")
+
+if [ -z "$test_php" ];then
+	echo "Error: PHP $php_version not found"
+fi
+
+
+domain_dir=/home/$user/web/$domain/
+public_html="$domain_dir"public_html/
+user_log_dir="$domain_dir"/logs/
+log_dir=/var/log/nginx/domains/
+default_page_template="$templates_path"index.html
+
+
+mkdir -p $public_html
+chown $user:$user $public_html
+mkdir $user_log_dir
+chown $user:$user $user_log_dir
+chmod 0551 $user_log_dir
+
+
+mkdir -p $log_dir
+
+if [ ! -f "$log_dir""$domain".log ];then 
+	touch "$log_dir""$domain".log
+fi
+if [ ! -f "$log_dir""$domain".error.log ];then 
+	touch "$log_dir""$domain".error.log
+fi
+
+chown root:$user "$log_dir""$domain".log
+chown root:$user "$log_dir""$domain".error.log
+chmod 0640 "$log_dir""$domain".log
+chmod 0640 "$log_dir""$domain".error.log
+
+ln -s "$log_dir""$domain".log "$user_log_dir""$domain".log
+ln -s "$log_dir""$domain".error.log "$user_log_dir""$domain".error.log
+chown -h $user:$user "$user_log_dir""$domain".log
+chown -h $user:$user "$user_log_dir""$domain".error.log
+
+
+public_html_is_empty=$(find "$public_html" -empty -type d)
+if [ ! -z "$public_html_is_empty" ];then
+	sed "s/%domain%/$domain/g" $default_page_template > "$public_html"index.html
+	chown $user:$user "$public_html"index.html
+fi
+
+
+fpm_conf_template="$templates_path"fpm.conf.template
+fpm_conf="/etc/php/$php_version/fpm/pool.d/$domain.conf"
+sed "s/%user%/${user}/g" $fpm_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $fpm_conf
+
+nginx_conf_template="$templates_path"nginx.conf.template
+nginx_conf=/etc/nginx/sites-available/$domain
+sed "s/%user%/${user}/g" $nginx_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $nginx_conf
+ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
+
+
+systemctl restart nginx.service
+service php$php_version-fpm restart
+

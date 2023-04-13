@@ -1,0 +1,40 @@
+#!/bin/bash
+
+source /root/sc/config
+
+user=$1
+
+user_str=$(grep "^$user:" /etc/passwd )
+if [ -z "$user_str" ]; then
+    exit
+fi
+
+
+# Defining user homedir
+home="$(echo $user_str |cut -f 6 -d :)"
+
+# Adding chroot directory
+if [ ! -d "/jail/$user/$user" ]; then
+	mkdir -p /jail/$user/$user
+
+	# Prepare the chroot directory
+	chown root:root /jail /jail/$user
+	chmod 755 /jail /jail/$user
+
+	# Prepare the user's actual home directory
+	chown $user: /jail/$user/$user
+	chmod 750 /jail/$user/$user
+
+	# Make it usable outside the chroot too
+	ln -s /jail/$user/$user /$user
+
+	# And now it can be assigned to the user.
+	#usermod -d /$user $user
+
+fi
+
+# Adding user to sftp group
+usermod -a -G sftp-only $user
+
+# Mouting home directory
+"$bin_path"sc-add-user-sftp-mount $user

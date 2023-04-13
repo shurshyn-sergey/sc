@@ -1,0 +1,28 @@
+server {
+    listen 80;
+    server_name  %domain%;
+    root         /home/%user%/web/%domain%/public_html;
+    index        index.php index.html index.htm;
+    access_log  /var/log/nginx/domains/%domain%.log combined;
+    error_log   /var/log/nginx/domains/%domain%.error.log error;
+
+
+ location / {
+
+        location ~* ^.+\.(jpeg|jpg|png|gif|bmp|ico|svg|css|js)$ {
+            expires     max;
+        }
+
+        location ~ [^/]\.php(/|$) {
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            if (!-f $document_root$fastcgi_script_name) {
+                return  404;
+            }
+
+            fastcgi_pass unix:/var/run/php/%php%-fpm-%domain%.sock;
+            fastcgi_index   index.php;
+            include         /etc/nginx/fastcgi_params;
+        }
+    }
+
+}

@@ -1,0 +1,9 @@
+#!/bin/bash
+config=/etc/redis/redis.conf
+supervised=$(cat  $config| egrep "^supervised")
+if [ "$supervised" = 'supervised no' ]; then
+	sed -i "s/^supervised no/supervised systemd/g" $config
+	systemctl restart redis.service
+fi
+
+

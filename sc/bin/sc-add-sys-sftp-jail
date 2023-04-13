@@ -1,0 +1,72 @@
+#!/bin/bash
+
+source /root/sc/config
+
+HOMEDIR=/home
+
+config='/etc/ssh/sshd_config'
+
+# Checking sshd directives
+sftp_n=$(grep -n "Subsystem.*sftp" $config |grep -v internal |grep -v ":#")
+sftp_i=$(grep -n "Subsystem.*sftp" $config |grep internal |grep -v ":#")
+
+# Disabling normal sftp
+if [ ! -z "$sftp_n" ]; then
+    fline=$(echo $sftp_n |cut -f 1 -d :)
+    sed -i "${fline}s/Subsystem.*sftp/#Subsystem sftp/" $config
+    restart='yes'
+fi
+
+# Enabling jailed sftp
+if [ -z "$sftp_i" ]; then
+    echo " " >> $config
+    echo "Subsystem sftp internal-sftp" >> $config
+    echo "Match Group sftp-only" >> $config
+    echo "ChrootDirectory /jail/%u" >> $config
+    echo "    AllowTCPForwarding no" >> $config
+    echo "    X11Forwarding no" >> $config
+    echo "    ForceCommand internal-sftp" >> $config
+    restart='yes'
+fi
+
+# Validating opensshd config
+if [ "$restart" = 'yes' ]; then
+    /usr/sbin/sshd -t >/dev/null 2>&1
+    if [ "$?" -ne 0 ]; then
+        echo "OpenSSH can not be restarted. Please check config"
+    else
+        service ssh restart >/dev/null 2>&1
+        service sshd restart >/dev/null 2>&1
+    fi
+fi
+
+# Adding sftp group
+groupadd sftp-only 2>/dev/null
+
+"$bin_path"sc-add-all-users-sftp-jail
+#shells="/bin/sh"
+#for user in $(grep "$HOMEDIR" /etc/passwd |egrep "$shells" |cut -f 1 -d:); do
+#    /root/sc-add-user-sftp-jail $user
+#done
+
+mount_service="/etc/systemd/system/sftpmount.service"
+if [ ! -f "$mount_service" ];then
+    echo "$FILE exists."
+    echo "[Unit]" >> $mount_service
+    echo "After=network.target" >> $mount_service
+    echo "" >> $mount_service
+    echo "[Service]" >> $mount_service
+    echo "ExecStart=${bin_path}sc-add-all-users-sftp-jail" >> $mount_service
+    echo "" >> $mount_service
+    echo "[Install]" >> $mount_service
+    echo "WantedBy=default.target" >> $mount_service
+    chmod 744 "$bin_path"sc-add-all-users-sftp-jail
+    chmod 664 $mount_service
+    systemctl daemon-reload
+    systemctl enable sftpmount.service
+fi
+
+
+
+
+
