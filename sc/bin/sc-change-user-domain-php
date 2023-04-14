@@ -1,12 +1,13 @@
 #!/bin/bash
 
-source /root/sc/config
+. /usr/local/sc/config
+
 user=$1
 domain=$2
 php_version=$3
 
 if [ -z $user ] || [ -z $domain ]; then
-	echo "Usage: change-user-domain-php [user] [domain] [php_version]";
+	echo "Usage: sc-change-user-domain-php [user] [domain] [php_version]";
 	exit
 fi
 
@@ -28,7 +29,9 @@ if [ -z "$test_php" ];then
 	exit
 fi
 
-nginx_conf_template="$templates_path"nginx.conf.template
+nginx_conf_template="${templates_path}"nginx.conf.template
+
+
 nginx_conf=/etc/nginx/sites-available/$domain
 fpm_conf_template="$templates_path"fpm.conf.template
 fpm_conf="/etc/php/$php_version/fpm/pool.d/$domain.conf"
@@ -41,12 +44,12 @@ fi
 # detect php_version
 current_php_version=$(cat $nginx_conf | grep "/var/run/php" | cut -f 2 -d: | cut -f 5 -d/ | cut -f 1 -d- | egrep "$php_versions")
 
-if [ "$php_version" == "$current_php_version"];then
+if [ "$php_version" == "$current_php_version" ];then
 	echo "Error: PHP version is the same"
 	exit
 fi
 
-"$bin_path"sc-change-user-domain-php $user $domain $php_version
+sc-add-user-domain $user $domain $php_version
 
 #domain_dir=/home/$user/web/$domain/
 #public_html="$domain_dir"public_html/

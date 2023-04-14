@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /root/sc/config
+source /usr/local/sc/config
 user=$1
 user_str=$(grep "^$user:" /etc/passwd )
 if [ -z "$user_str" ]; then

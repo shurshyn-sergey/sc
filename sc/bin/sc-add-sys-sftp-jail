@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /root/sc/config
+source /usr/local/sc/config
 
 HOMEDIR=/home
 

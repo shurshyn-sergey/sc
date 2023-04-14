@@ -1,13 +1,13 @@
 #!/bin/bash
 
-source /root/sc/config
+source /usr/local/sc/config
 
 user=$1
 domain=$2
 php_version=$3
 
 if [ -z $user ] || [ -z $domain ]; then
-	echo "Usage: add-user-domain [user] [domain] [php_version]";
+	echo "Usage: sc-add-user-domain [user] [domain] [php_version]";
 	exit
 fi
 
@@ -33,19 +33,24 @@ fi
 
 domain_dir=/home/$user/web/$domain/
 public_html="$domain_dir"public_html/
-user_log_dir="$domain_dir"/logs/
+user_log_dir="$domain_dir"logs/
 log_dir=/var/log/nginx/domains/
 default_page_template="$templates_path"index.html
 
 
-mkdir -p $public_html
-chown $user:$user $public_html
-mkdir $user_log_dir
-chown $user:$user $user_log_dir
-chmod 0551 $user_log_dir
+if [ ! -d "$public_html" ]; then
+  mkdir -p $public_html
+  chown $user:$user $public_html
+fi
+if [ ! -d "$user_log_dir" ]; then
+  mkdir $user_log_dir
+  chown $user:$user $user_log_dir
+  chmod 0551 $user_log_dir
+fi
 
-
-mkdir -p $log_dir
+if [ ! -d "$log_dir" ]; then
+  mkdir -p $log_dir
+fi
 
 if [ ! -f "$log_dir""$domain".log ];then 
 	touch "$log_dir""$domain".log
@@ -59,8 +64,14 @@ chown root:$user "$log_dir""$domain".error.log
 chmod 0640 "$log_dir""$domain".log
 chmod 0640 "$log_dir""$domain".error.log
 
-ln -s "$log_dir""$domain".log "$user_log_dir""$domain".log
-ln -s "$log_dir""$domain".error.log "$user_log_dir""$domain".error.log
+access_log_symlink="$user_log_dir""$domain".log
+if [ ! -L "$access_log_symlink" ];then
+  ln -s "$log_dir""$domain".log "$access_log_symlink"
+fi
+error_log_symlink="$user_log_dir""$domain".error.log
+if [ ! -L "$error_log_symlink" ];then
+  ln -s "$log_dir""$domain".error.log "$error_log_symlink"
+fi
 chown -h $user:$user "$user_log_dir""$domain".log
 chown -h $user:$user "$user_log_dir""$domain".error.log
 
@@ -79,7 +90,12 @@ sed "s/%user%/${user}/g" $fpm_conf_template | sed "s/%domain%/$domain/g" | sed "
 nginx_conf_template="$templates_path"nginx.conf.template
 nginx_conf=/etc/nginx/sites-available/$domain
 sed "s/%user%/${user}/g" $nginx_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $nginx_conf
-ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
+
+
+site_enable_symlink=/etc/nginx/sites-enabled/$domain
+if [ ! -L "$site_enable_symlink" ];then
+  ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
+fi
 
 
 systemctl restart nginx.service

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+user=$1
+password=$2
+
+if [ -z $user ] || [ -z $password ] ; then
+	echo "Usage: sc-add-mysql-user [user]";
+	exit
+fi
+
+#test=$(mysql --execute="SELECT * FROM mysql.user;")
+mysql --execute="CREATE USER IF NOT EXISTS '${user}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${password}';"
+mysql --execute="CREATE DATABASE IF NOT EXISTS ${user};"
+mysql --execute="GRANT ALL PRIVILEGES ON ${user}.* TO '${user}'@'localhost';"
+mysql --execute="FLUSH PRIVILEGES;"
+

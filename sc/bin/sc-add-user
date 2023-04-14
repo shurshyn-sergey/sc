@@ -1,0 +1,16 @@
+#!/bin/bash
+
+user=$1
+
+if [ -z $user ] ; then
+	echo "Usage: sc-add-user [user]";
+	exit
+fi
+useradd -d /home/"$user"/ -m "$user"
+chmod 0755 /home/"$user"
+
+mkdir /home/"$user"/tmp
+chown username:username /home/"$user"/tmp
+chmod 0700 /home/"$user"/tmp
+
+passwd $user
