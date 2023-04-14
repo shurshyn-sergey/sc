@@ -2,6 +2,8 @@
 
 ```
 git clone https://github.com/shurshyn-sergey/sc.git
+```
+```
 ./sc/install.sh
 ```
 
