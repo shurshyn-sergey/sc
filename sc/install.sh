@@ -38,6 +38,7 @@ apt install redis-server
 apt install mysql-server
 systemctl start mysql.service
 
+apt install -y nginx
 
-
+sed -i -E 's/\/var\/log\/nginx.*/\/var\/log\/nginx\/*log \/var\/log\/nginx\/domains\/*log {/g' /etc/logrotate.d/nginx
 
