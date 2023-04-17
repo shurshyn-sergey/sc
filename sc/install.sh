@@ -42,3 +42,5 @@ apt install -y nginx
 
 sed -i -E 's/\/var\/log\/nginx.*/\/var\/log\/nginx\/*log \/var\/log\/nginx\/domains\/*log {/g' /etc/logrotate.d/nginx
 
+"$SC"/sc-add-sys-dftp-jail
+
