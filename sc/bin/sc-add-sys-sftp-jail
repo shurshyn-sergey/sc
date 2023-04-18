@@ -51,7 +51,6 @@ groupadd sftp-only 2>/dev/null
 
 mount_service="/etc/systemd/system/sftpmount.service"
 if [ ! -f "$mount_service" ];then
-    echo "$FILE exists."
     echo "[Unit]" >> $mount_service
     echo "After=network.target" >> $mount_service
     echo "" >> $mount_service
