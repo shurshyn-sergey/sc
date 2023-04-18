@@ -4,7 +4,7 @@
 git clone https://github.com/shurshyn-sergey/sc.git
 ```
 ```
-./sc/install.sh
+chmod u+x ./sc/sc/install.sh && ./sc/sc/install.sh
 ```
 
 ## AFTER INSTALL
