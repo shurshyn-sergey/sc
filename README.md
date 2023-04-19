@@ -7,6 +7,8 @@ git clone https://github.com/shurshyn-sergey/sc.git
 chmod u+x ./sc/sc/install.sh && ./sc/sc/install.sh
 ```
 
+
+<!---
 ## AFTER INSTALL
 ```
 mysql
@@ -23,6 +25,7 @@ mysql_secure_installation
 mysql -u root -p
 ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
 ```
+-->
 
 
 ## COMMANDS

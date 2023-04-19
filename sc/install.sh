@@ -44,3 +44,6 @@ sed -i -E 's/\/var\/log\/nginx.*/\/var\/log\/nginx\/*log \/var\/log\/nginx\/doma
 
 "$SC"/bin/sc-add-sys-sftp-jail
 
+mysql --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';"
+mysql_secure_installation;
+
