@@ -47,7 +47,7 @@ sed -i -E 's/\/var\/log\/nginx.*/\/var\/log\/nginx\/*log \/var\/log\/nginx\/doma
 #mysql --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
 #mysql_secure_installation
 
-mysql --execute "UPDATE mysql.user SET Password=PASSWORD('') WHERE User='root';";
+#mysql --execute "UPDATE mysql.user SET Password=PASSWORD('') WHERE User='root';";
 mysql --execute "DELETE FROM mysql.user WHERE User='';";
 mysql --execute "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');";
 mysql --execute "DROP DATABASE IF EXISTS test;";
