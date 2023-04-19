@@ -6,6 +6,7 @@ user=$1
 
 user_str=$(grep "^$user:" /etc/passwd )
 if [ -z "$user_str" ]; then
+    echo "User $user not found"
     exit
 fi
 
