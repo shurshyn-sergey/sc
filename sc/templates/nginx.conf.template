@@ -5,6 +5,7 @@ server {
     index        index.php index.html index.htm;
     access_log  /var/log/nginx/domains/%domain%.log combined;
     error_log   /var/log/nginx/domains/%domain%.error.log error;
+    client_max_body_size 32m;
 
 
  location / {

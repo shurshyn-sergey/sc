@@ -1,0 +1,13 @@
+#!/bin/bash
+
+user=$1
+
+if [ -z "$user" ] ; then
+	echo "Usage: sc-add-sudo-user [user]";
+	exit
+fi
+
+adduser "$user"
+
+usermod -aG sudo "$user"
+

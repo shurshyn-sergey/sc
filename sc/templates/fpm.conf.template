@@ -14,6 +14,12 @@ pm.process_idle_timeout = 10s
 
 php_admin_value[upload_tmp_dir] = /home/%user%/tmp
 php_admin_value[session.save_path] = /home/%user%/tmp
+php_admin_value[upload_max_filesize] = 32M
+php_admin_value[post_max_size] = 32M
+php_admin_value[memory_limit] = 256M
+php_admin_value[max_execution_time] = 600
+php_admin_value[max_input_vars] = 1000
+php_admin_value[max_input_time] = 400
 
 pm.start_servers = 2
 pm.min_spare_servers = 1
