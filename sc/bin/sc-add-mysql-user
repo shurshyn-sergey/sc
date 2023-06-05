@@ -1,16 +1,34 @@
 #!/bin/bash
 
 user=$1
-password=$2
-db=$3
+#password=$2
+db=$2
 
-if [ -z "$user" ] || [ -z "$password" ] ; then
-	echo "Usage: sc-add-mysql-user [user] [password] [db]";
+if [ -z "$user" ]; then
+	echo "Usage: sc-add-mysql-user [user] [db]";
 	exit
 fi
 
 if [ -z "$db" ];then
   db="$user"
+fi
+
+echo -n 'Password:'
+read -s password
+
+echo -n -e '\nRepeat password:'
+read -s password1
+echo -e '\n'
+
+if [ -z "$password" ]; then
+	echo "Error: Password is empty";
+	exit
+fi
+
+
+if [ "$password" != "$password1" ]; then
+	echo "Error: Password mismatch";
+	exit
 fi
 
 #test=$(mysql --execute="SELECT * FROM mysql.user;")
@@ -19,3 +37,4 @@ mysql --execute="CREATE DATABASE IF NOT EXISTS ${db};"
 mysql --execute="GRANT ALL PRIVILEGES ON ${db}.* TO '${user}'@'localhost';"
 mysql --execute="FLUSH PRIVILEGES;"
 
+echo "Done!";
