@@ -31,6 +31,14 @@ apt install -y php8.1-cli php8.1-common  php8.1-curl php8.1-dom php8.1-intl php8
 apt install -y php8.2 php8.2-fpm
 apt install -y php8.2-cli php8.2-common  php8.2-curl php8.2-dom php8.2-intl php8.2-mbstring php8.2-mysqli php8.2-mysqlnd php8.2-SimpleXML php8.2-xml php8.2-xmlreader php8.2-xmlwriter php8.2-xsl php8.2-zip php8.2-gd php8.2-bcmath
 
+
+apt install -y fail2ban
+fban_config=/etc/fail2ban/jail.local
+cp /etc/fail2ban/jail.conf "$fban_config"
+sed -i -E '/\[sshd\]/{N;N;N;N;N;N;s#port.*#mode = aggressive\nport = ssh\nmaxretry = 2\nbantime = 10h#}' "$fban_config"
+service fail2ban restart
+
+
 apt install -y redis-server
 
 ./bin/sc-redis-config
