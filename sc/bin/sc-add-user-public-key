@@ -1,0 +1,26 @@
+#!/bin/bash
+
+user=$1
+
+if [ -z "$user" ] ; then
+	echo "Usage: sc-add-user-public-key [user]";
+	exit
+fi
+
+ssh_dir=/home/"$user"/.ssh
+
+if [ ! -d "$ssh_dir" ] ; then
+  mkdir "$ssh_dir"
+  chown "$user":"$user" "$ssh_dir"
+  chmod 0700 "$ssh_dir"
+fi
+
+auth_keys="$ssh_dir/authorized_keys"
+
+echo -n 'Enter public key:'
+read -s public_key
+
+echo "$public_key" >> "$auth_keys"
+chown "$user":"$user" "$auth_keys"
+chmod 0600 "$auth_keys"
+

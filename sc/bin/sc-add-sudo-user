@@ -7,7 +7,15 @@ if [ -z "$user" ] ; then
 	exit
 fi
 
-adduser "$user"
+adduser --disabled-password --gecos "" "$user"
 
 usermod -aG sudo "$user"
+
+mkdir /home/"$user"/.ssh
+chown "$user":"$user" /home/"$user"/.ssh
+chmod 0700 /home/"$user"/.ssh
+
+# enable to run sudo commands without password prompt
+echo "$user ALL=(ALL) NOPASSWD: ALL" >> "/etc/sudoers.d/$user"
+
 

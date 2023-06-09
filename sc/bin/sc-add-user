@@ -13,4 +13,9 @@ mkdir /home/"$user"/tmp
 chown "$user":"$user" /home/"$user"/tmp
 chmod 0700 /home/"$user"/tmp
 
+mkdir /home/"$user"/.ssh
+chown "$user":"$user" /home/"$user"/.ssh
+chmod 0700 /home/"$user"/.ssh
+
+
 passwd $user

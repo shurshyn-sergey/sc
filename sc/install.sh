@@ -43,12 +43,19 @@ apt install -y nginx
 sed -i -E 's/\/var\/log\/nginx.*/\/var\/log\/nginx\/*log \/var\/log\/nginx\/domains\/*log {/g' /etc/logrotate.d/nginx
 sed -i -E 's/create.*/create/g' /etc/logrotate.d/nginx
 
+# disable ssh/sftp password authentication
+sed -i -E 's/PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
+service sshd restart
+
+
 # composer
 curl -sS https://getcomposer.org/installer -o composer-setup.php
 php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 
 "$SC"/bin/sc-add-sys-sftp-jail
+
+"$SC"/bin/sc-add-sudo-user dm-deployer
 
 #mysql --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
 #mysql_secure_installation
