@@ -67,3 +67,9 @@ mysql --execute "DROP DATABASE IF EXISTS test;";
 mysql --execute "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';";
 mysql --execute "FLUSH PRIVILEGES;";
 
+# iptables
+
+iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp -j DROP
