@@ -7,6 +7,9 @@ if [ -z $user ] ; then
 	exit
 fi
 useradd -d /home/"$user"/ -m "$user"
+
+chsh -s /bin/bash "$user"
+
 chmod 0755 /home/"$user"
 
 mkdir /home/"$user"/tmp
@@ -16,6 +19,5 @@ chmod 0700 /home/"$user"/tmp
 mkdir /home/"$user"/.ssh
 chown "$user":"$user" /home/"$user"/.ssh
 chmod 0700 /home/"$user"/.ssh
-
 
 passwd $user
