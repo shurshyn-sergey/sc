@@ -63,7 +63,7 @@ php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 "$SC"/bin/sc-add-sys-sftp-jail
 
-"$SC"/bin/sc-add-sudo-user dm-deployer
+#"$SC"/bin/sc-add-sudo-user dm-deployer
 
 #mysql --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
 #mysql_secure_installation
@@ -77,7 +77,7 @@ mysql --execute "FLUSH PRIVILEGES;";
 
 # iptables
 
-iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-iptables -I INPUT -p tcp --dport 443 -j ACCEPT
-iptables -I INPUT -p tcp --dport 22 -j ACCEPT
-iptables -A INPUT -p tcp -j DROP
+#iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+#iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+#iptables -I INPUT -p tcp --dport 22 -j ACCEPT
+#iptables -A INPUT -p tcp -j DROP
