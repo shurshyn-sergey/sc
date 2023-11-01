@@ -1,0 +1,77 @@
+#!/bin/bash
+
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
+
+# Argument definition
+user=$1
+domain=$2
+
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+## todo get php_version
+if [ -z "$php_version" ];then
+	php_version="8.2"
+fi
+
+
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '2' "$#" 'USER DOMAIN'
+is_user_exist "$user"
+
+
+is_object_valid 'user' 'USER' "$user"
+is_object_valid 'web' 'DOMAIN' "$domain"
+
+
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
+
+domain_dir=/home/$user/web/$domain/
+log_dir=/var/log/nginx/domains/
+
+php_version=$(get_object_value 'web' 'DOMAIN' "$domain" '$PHP_VERSION')
+
+if [ -d "$domain_dir" ]; then
+  rm -rf "$domain_dir"
+fi
+
+if [ -f "$log_dir""$domain".log ];then
+	rm "$log_dir""$domain".log
+fi
+
+if [ -f "$log_dir""$domain".error.log ];then
+	rm "$log_dir""$domain".error.log
+fi
+
+fpm_conf="/etc/php/$php_version/fpm/pool.d/$domain.conf"
+if [ -f "$fpm_conf" ];then
+  rm "$fpm_conf"
+fi
+
+nginx_conf=/etc/nginx/sites-available/$domain
+if [ -f "$nginx_conf" ];then
+  rm "$nginx_conf"
+fi
+
+site_enable_symlink=/etc/nginx/sites-enabled/$domain
+if [ -L "$site_enable_symlink" ];then
+  rm "$site_enable_symlink"
+fi
+
+decrease_user_value "$user" '$U_WEB_DOMAINS'
+
+# Deleting domain from web.conf
+sed -i "/DOMAIN='$domain'/ d" $USER_DATA/web.conf
+
+systemctl restart nginx.service
+service php$php_version-fpm restart
+

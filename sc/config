@@ -1,4 +1,5 @@
 #!/bin/bash
-bin_path='/usr/local/sc/bin/'
+sc='/usr/local/sc'
+BIN="$sc/bin/"
 templates_path='/usr/local/sc/templates/'
 php_versions="7.4|8.1|8.2"

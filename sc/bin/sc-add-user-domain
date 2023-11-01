@@ -1,28 +1,30 @@
 #!/bin/bash
 
-source /usr/local/sc/config
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
 
+# Argument definition
 user=$1
 domain=$2
 php_version=$3
 
-if [ -z $user ] || [ -z $domain ]; then
-	echo "Usage: sc-add-user-domain [user] [domain] [php_version]";
-	exit
-fi
-
-user_str=$(grep /home /etc/passwd | grep "$user" |cut -f 1 -d:)
-
-if [ -z "$user_str" ] || [ "$user" != "$user_str" ]; then
-	echo "User not found";
-	exit
-fi
-
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
 
 if [ -z "$php_version" ];then
 	php_version="8.2"
 fi
 
+
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '2' "$#" 'USER DOMAIN [PHP_VERSION]'
+is_user_exist "$user"
 
 test_php=$(echo "$php_version" | egrep "$php_versions")
 
@@ -30,6 +32,9 @@ if [ -z "$test_php" ];then
 	echo "Error: PHP $php_version not found"
 fi
 
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
 
 domain_dir=/home/$user/web/$domain/
 public_html="$domain_dir"public_html/
@@ -42,6 +47,7 @@ if [ ! -d "$public_html" ]; then
   mkdir -p $public_html
   chown $user:$user $public_html
 fi
+
 if [ ! -d "$user_log_dir" ]; then
   mkdir $user_log_dir
   chown $user:$user $user_log_dir
@@ -97,6 +103,19 @@ if [ ! -L "$site_enable_symlink" ];then
   ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
 fi
 
+
+# Generating timestamp
+time_n_date=$(date +'%T %F')
+time=$(echo "$time_n_date" |cut -f 1 -d \ )
+date=$(echo "$time_n_date" |cut -f 2 -d \ )
+
+increase_user_value "$user" '$U_WEB_DOMAINS'
+
+
+# Adding domain in web.conf
+echo "DOMAIN='$domain'\
+ PHP_VERSION='$php_version'\
+ TIME='$time' DATE='$date'" >> $USER_DATA/web.conf
 
 systemctl restart nginx.service
 service php$php_version-fpm restart

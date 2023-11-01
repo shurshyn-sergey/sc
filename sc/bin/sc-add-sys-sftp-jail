@@ -43,7 +43,7 @@ fi
 # Adding sftp group
 groupadd sftp-only 2>/dev/null
 
-"$bin_path"sc-add-all-users-sftp-jail
+"$BIN"sc-add-all-users-sftp-jail
 #shells="/bin/sh"
 #for user in $(grep "$HOMEDIR" /etc/passwd |egrep "$shells" |cut -f 1 -d:); do
 #    /root/sc-add-user-sftp-jail $user
@@ -55,11 +55,11 @@ if [ ! -f "$mount_service" ];then
     echo "After=network.target" >> $mount_service
     echo "" >> $mount_service
     echo "[Service]" >> $mount_service
-    echo "ExecStart=${bin_path}sc-add-all-users-sftp-jail" >> $mount_service
+    echo "ExecStart=${BIN}sc-add-all-users-sftp-jail" >> $mount_service
     echo "" >> $mount_service
     echo "[Install]" >> $mount_service
     echo "WantedBy=default.target" >> $mount_service
-    chmod 744 "$bin_path"sc-add-all-users-sftp-jail
+    chmod 744 "$BIN"sc-add-all-users-sftp-jail
     chmod 664 $mount_service
     systemctl daemon-reload
     systemctl enable sftpmount.service

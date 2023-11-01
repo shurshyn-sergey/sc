@@ -3,6 +3,7 @@
 source /usr/local/sc/config
 
 user=$1
+mount_dir=$2
 
 user_str=$(grep "^$user:" /etc/passwd )
 if [ -z "$user_str" ]; then
@@ -38,4 +39,4 @@ fi
 usermod -a -G sftp-only $user
 
 # Mouting home directory
-"$bin_path"sc-add-user-sftp-mount $user
+"$BIN"sc-add-user-sftp-mount $user $mount_dir

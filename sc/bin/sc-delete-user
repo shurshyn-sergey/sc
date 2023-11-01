@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
+
+# Argument definition
+user=$1
+
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '1' "$#" 'USER'
+is_user_exist "$user"
+
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
+
+userdel "$user"
+
+## todo delete user domains and db
+
+
+if [ -d "$HOMEDIR/$user" ]; then
+  rm -r "$HOMEDIR/$user"
+fi
+if [ -d "$USER_DATA" ]; then
+  rm -r "$USER_DATA"
+fi

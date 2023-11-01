@@ -1,12 +1,36 @@
 #!/bin/bash
 
-user=$1
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
 
-if [ -z $user ] ; then
-	echo "Usage: sc-add-user [user]";
-	exit
+# Argument definition
+user=$1
+password=$2
+show_password=""
+
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '1' "$#" 'USER [PASSWORD]'
+is_user_free "$user"
+
+if [ -z "$password" ]; then
+  password=$(generate_password)
+  show_password=1
 fi
-useradd -d /home/"$user"/ -m "$user"
+
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
+
+useradd -d "$HOMEDIR"/"$user"/ -m "$user"
+echo "$user:$password" | /usr/sbin/chpasswd
 
 chsh -s /bin/bash "$user"
 
@@ -20,4 +44,30 @@ mkdir /home/"$user"/.ssh
 chown "$user":"$user" /home/"$user"/.ssh
 chmod 0700 /home/"$user"/.ssh
 
-passwd $user
+if [ ! -z "$show_password" ]; then
+  echo "Password:$password"
+fi
+
+# Adding user dir
+mkdir -p  $USER_DATA
+
+# Creating configuration files and p
+touch $USER_DATA/web.conf \
+      $USER_DATA/db.conf
+
+chmod 660 $USER_DATA/web.conf \
+          $USER_DATA/db.conf
+
+# Generating timestamp
+time_n_date=$(date +'%T %F')
+time=$(echo "$time_n_date" |cut -f 1 -d \ )
+date=$(echo "$time_n_date" |cut -f 2 -d \ )
+
+echo "MD5='$(awk -v user=$user -F : 'user == $1 {print $2}' /etc/shadow)'
+U_WEB_DOMAINS='0'
+U_DATABASES='0'
+TIME='$time'
+DATE='$date'" > $USER_DATA/user.conf
+chmod 660 $USER_DATA/user.conf
+
+#passwd $user

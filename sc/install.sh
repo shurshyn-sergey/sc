@@ -9,6 +9,8 @@ mkdir $SC
 
 cp -R "$SCRIPT_DIR"/* "$SC"
 
+chmod u+x ./update.sh
+
 # Configuring system env
 echo "export SC='$SC'" > /etc/profile.d/sc.sh
 chmod 755 /etc/profile.d/sc.sh
