@@ -144,3 +144,37 @@ add_object_key() {
         sed -i "$lnr s/$5='/$4='' $5='/" $USER_DATA/$1.conf
     fi
 }
+
+is_object_new() {
+    if [ $2 = 'USER' ]; then
+        if [ -d "$USER_DATA" ]; then
+            object="OK"
+        fi
+    else
+        object=$(grep "$2='$3'" $USER_DATA/$1.conf)
+    fi
+    if [ ! -z "$object" ]; then
+        check_result $E_EXISTS "$2=$3 is already exists"
+    fi
+}
+
+search_objects() {
+    OLD_IFS="$IFS"
+    IFS=$'\n'
+    for line in $(grep $2=\'$3\' $USER_DATA/$1.conf); do
+        eval $line
+        eval echo \$$4
+    done
+    IFS="$OLD_IFS"
+}
+
+
+list_objects() {
+    OLD_IFS="$IFS"
+    IFS=$'\n'
+    for line in $(cat $USER_DATA/$1.conf); do
+        eval $line
+        eval echo \$$2
+    done
+    IFS="$OLD_IFS"
+}

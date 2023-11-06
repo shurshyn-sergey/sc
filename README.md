@@ -29,14 +29,15 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
 
 
 ## COMMANDS
-| Command                                                   | Description                                                           |
-|-----------------------------------------------------------|-----------------------------------------------------------------------|
-| `sc-add-user user [password]`                             | add system user                                                       |
-| `sc-delete-user user`                                     | delete system user                                                    |
-| `sc-add-sudo-user user`                                   | add sudo user                                                         |
-| `sc-add-user-public-key user`                             | add user public key                                                   |
-| `sc-add-mysql-user user [db]`                             | add mysql user with same db name as username ( if db is not provided) |
-| `sc-add-user-domain user domain [php_version]`            | add user domain                                                       |
-| `sc-delete-user-domain user domain`                       | delete user domain                                                    |
-| `sc-add-user-sftp-jail [user]`                            | chroot user to home dir and access via sftp only                      |
-| `sc-change-user-domain-php [user] [domain] [php_version]` | change domain php version                                             |
+| Command                                                 | Description                                                             |
+|---------------------------------------------------------|-------------------------------------------------------------------------|
+| `sc-add-user user [password]`                           | add system user                                                         |
+| `sc-delete-user user`                                   | delete system user                                                      |
+| `sc-add-sudo-user user`                                 | add sudo user                                                           |
+| `sc-add-user-public-key user`                           | add user public key                                                     |
+| `sc-add-mysql-database user database dbuser [password]` | add mysql database and user ( system user prefix adding automatically ) |
+| `sc-delete-mysql-database user database`                | delete mysql database and user                                          |
+| `sc-add-user-domain user domain [php_version]`          | add user domain                                                         |
+| `sc-delete-user-domain user domain`                     | delete user domain                                                      |
+| `sc-add-user-sftp-jail [user]`                          | chroot user to home dir and access via sftp only                        |
+| `sc-change-user-domain-php user domain php_version`     | change domain php version                                               |

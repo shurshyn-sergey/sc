@@ -22,10 +22,15 @@ is_user_exist "$user"
 #                       Action                             #
 #----------------------------------------------------------#
 
+for domain in $(list_objects 'web' 'DOMAIN'); do
+  sc-delete-user-domain "$user" "$domain"
+done
+
+for db in $(list_objects 'db' 'DB'); do
+  sc-delete-mysql-database "$user" "$db"
+done
+
 userdel "$user"
-
-## todo delete user domains and db
-
 
 if [ -d "$HOMEDIR/$user" ]; then
   rm -r "$HOMEDIR/$user"

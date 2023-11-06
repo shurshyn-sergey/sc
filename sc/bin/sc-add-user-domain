@@ -42,6 +42,7 @@ user_log_dir="$domain_dir"logs/
 log_dir=/var/log/nginx/domains/
 default_page_template="$templates_path"index.html
 
+is_domain=$(get_object_value 'web' 'DOMAIN' "$domain" '$DOMAIN')
 
 if [ ! -d "$public_html" ]; then
   mkdir -p $public_html
@@ -88,6 +89,14 @@ if [ ! -z "$public_html_is_empty" ];then
 	chown $user:$user "$public_html"index.html
 fi
 
+if [ ! -z "$is_domain" ];then
+  old_php_version=$(get_object_value 'web' 'DOMAIN' "$domain" '$PHP_VERSION')
+  old_fpm_conf="/etc/php/$old_php_version/fpm/pool.d/$domain.conf"
+  if [ -f "$old_fpm_conf" ];then
+    rm "$old_fpm_conf"
+    service php$old_php_version-fpm restart
+  fi
+fi
 
 fpm_conf_template="$templates_path"fpm.conf.template
 fpm_conf="/etc/php/$php_version/fpm/pool.d/$domain.conf"
@@ -104,18 +113,23 @@ if [ ! -L "$site_enable_symlink" ];then
 fi
 
 
-# Generating timestamp
-time_n_date=$(date +'%T %F')
-time=$(echo "$time_n_date" |cut -f 1 -d \ )
-date=$(echo "$time_n_date" |cut -f 2 -d \ )
 
-increase_user_value "$user" '$U_WEB_DOMAINS'
+if [ -z "$is_domain" ];then
 
+  # Generating timestamp
+  time_n_date=$(date +'%T %F')
+  time=$(echo "$time_n_date" |cut -f 1 -d \ )
+  date=$(echo "$time_n_date" |cut -f 2 -d \ )
+  increase_user_value "$user" '$U_WEB_DOMAINS'
 
-# Adding domain in web.conf
-echo "DOMAIN='$domain'\
- PHP_VERSION='$php_version'\
- TIME='$time' DATE='$date'" >> $USER_DATA/web.conf
+  # Adding domain in web.conf
+  echo "DOMAIN='$domain'\
+   PHP_VERSION='$php_version'\
+   TIME='$time' DATE='$date'" >> $USER_DATA/web.conf
+   else
+     update_object_value 'web' 'DOMAIN' "$domain" '$PHP_VERSION' "$php_version"
+fi
+
 
 systemctl restart nginx.service
 service php$php_version-fpm restart

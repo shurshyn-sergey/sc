@@ -12,11 +12,6 @@ domain=$2
 source "/usr/local/sc/config"
 source "$sc/func/main.sh"
 
-## todo get php_version
-if [ -z "$php_version" ];then
-	php_version="8.2"
-fi
-
 
 
 #----------------------------------------------------------#
