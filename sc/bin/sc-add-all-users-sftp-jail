@@ -4,6 +4,9 @@ source /usr/local/sc/config
 
 HOMEDIR=/home
 shells="/bin/sh"
-for user in $(grep "$HOMEDIR" /etc/passwd |egrep "$shells" |cut -f 1 -d:); do
-    "$bin_path"add-user-sftp-jail $user
+for user in $(grep "$HOMEDIR" /etc/passwd | cut -f 1 -d:); do
+    is_sftp=$(groups $user | grep sftp-only)
+    if [ -n "$is_sftp" ]; then
+        "$bin_path"sc-add-user-sftp-jail $user
+    fi
 done
