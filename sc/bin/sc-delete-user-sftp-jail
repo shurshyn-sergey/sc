@@ -1,0 +1,37 @@
+#!/bin/bash
+
+source /usr/local/sc/config
+
+user=$1
+
+user_str=$(grep "^$user:" /etc/passwd )
+if [ -z "$user_str" ]; then
+    echo "User $user not found"
+    exit
+fi
+
+
+
+
+
+#unmount mount point
+mount_str=$(mount | grep "/jail/$user/$user")
+if [ -n "$mount_str" ]; then
+  umount /jail/$user/$user
+fi
+
+# Remove chroot directory
+if [  -d "/jail/$user" ]; then
+  rm -rf /jail/$user
+fi
+
+if [ -L "/$user" ]; then
+  rm -f /$user
+fi
+
+# Remove user sftp group
+is_sftp=$(groups $user | grep sftp-only)
+if [ -n "$is_sftp" ]; then
+  gpasswd --delete $user sftp-only
+fi
+

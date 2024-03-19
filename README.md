@@ -40,4 +40,5 @@ ALTER USER 'root'@'localhost' IDENTIFIED WITH auth_socket;
 | `sc-add-user-domain user domain [php_version]`          | add user domain                                                         |
 | `sc-delete-user-domain user domain`                     | delete user domain                                                      |
 | `sc-add-user-sftp-jail [user]`                          | chroot user to home dir and access via sftp only                        |
+| `sc-delete-user-sftp-jail [user]                        | delete user sftp jail                                                   |
 | `sc-change-user-domain-php user domain php_version`     | change domain php version                                               |

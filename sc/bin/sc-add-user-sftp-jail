@@ -36,7 +36,11 @@ if [ ! -d "/jail/$user/$user" ]; then
 fi
 
 # Adding user to sftp group
-usermod -a -G sftp-only $user
+is_sftp=$(groups $user | grep sftp-only)
+if [ -z "$is_sftp" ]; then
+  usermod -a -G sftp-only $user
+fi
+
 
 # Mouting home directory
 "$BIN"sc-add-user-sftp-mount $user $mount_dir
