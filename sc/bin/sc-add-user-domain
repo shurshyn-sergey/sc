@@ -104,7 +104,12 @@ sed "s/%user%/${user}/g" $fpm_conf_template | sed "s/%domain%/$domain/g" | sed "
 
 nginx_conf_template="$templates_path"nginx.conf.template
 nginx_conf=/etc/nginx/sites-available/$domain
-sed "s/%user%/${user}/g" $nginx_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $nginx_conf
+if [ -f "$nginx_conf" ];then
+    fastcgi="fastcgi_pass unix:\/var\/run\/php\/php${php_version}-fpm-${domain}.sock;"
+    sed -i "s/fastcgi_pass.*/$fastcgi/" $nginx_conf
+  else
+    sed "s/%user%/${user}/g" $nginx_conf_template | sed "s/%domain%/$domain/g" | sed "s/%php%/$php_version/g" > $nginx_conf
+fi
 
 
 site_enable_symlink=/etc/nginx/sites-enabled/$domain
