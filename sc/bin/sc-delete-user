@@ -22,6 +22,31 @@ is_user_exist "$user"
 #                       Action                             #
 #----------------------------------------------------------#
 
+
+while true; do
+
+read -p "Do you want to delete user $user? (yes/no) " yn
+
+case $yn in
+	yes ) break;;
+	no ) echo exiting...;
+		exit;;
+	* ) echo invalid response;;
+esac
+done
+
+while true; do
+read -p "Warning! This will delete all user data ( user domains/databases/configurations and user itself ). Are you sure? (yes/no)" yn
+case $yn in
+	yes ) break;;
+	no ) echo exiting...;
+		exit;;
+	* ) echo invalid response;;
+esac
+done
+
+echo "Deleting user $user"
+
 for domain in $(list_objects 'web' 'DOMAIN'); do
   sc-delete-user-domain "$user" "$domain"
 done
@@ -38,3 +63,5 @@ fi
 if [ -d "$USER_DATA" ]; then
   rm -r "$USER_DATA"
 fi
+
+echo "User $user deleted"

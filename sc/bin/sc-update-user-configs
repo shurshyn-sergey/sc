@@ -1,0 +1,122 @@
+#!/bin/bash
+
+
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
+
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+#----------------------------------------------------------#
+#                    Action                                #
+#----------------------------------------------------------#
+
+users=$(cat /etc/passwd | grep /home | egrep -v 'nologin|false' | cut -d: -f1 | tr '\n' ' ')
+
+for user in $users; do
+
+  USR_DATA=${USER_DATA}${user}
+  if [ ! -d "$USR_DATA" ]; then
+
+
+    ################### Adding empty user configs ##############
+    mkdir -p  $USR_DATA
+    touch $USR_DATA/web.conf \
+          $USR_DATA/db.conf
+
+    chmod 660 $USR_DATA/web.conf \
+              $USR_DATA/db.conf
+
+    # Generating timestamp
+    time_n_date=$(date +'%T %F')
+    time=$(echo "$time_n_date" |cut -f 1 -d \ )
+    date=$(echo "$time_n_date" |cut -f 2 -d \ )
+
+echo "MD5='$(awk -v user=$user -F : 'user == $1 {print $2}' /etc/shadow)'
+U_WEB_DOMAINS='0'
+U_DATABASES='0'
+TIME='$time'
+DATE='$date'" > $USR_DATA/user.conf
+chmod 660 $USR_DATA/user.conf
+  ################### Adding empty user configs ##############
+
+
+
+    ################ detect user domains and add to web.conf ##############
+    all_domains=$(ls /etc/nginx/sites-enabled/ | tr '\n' ' ')
+
+    for domain in $all_domains; do
+      is_user_domain=$(cat /etc/nginx/sites-available/"$domain" | grep /home/$user)
+      if [ ! -z "$is_user_domain" ]; then
+        php_version=$(cat /etc/nginx/sites-available/"$domain" | grep 'fastcgi_pass' | cut -d/ -f5 | cut -d- -f1)
+        increase_user_value "$user" '$U_WEB_DOMAINS'
+
+        # Adding domain in web.conf
+        echo "DOMAIN='$domain'\
+        PHP_VERSION='$php_version'\
+        TIME='$time' DATE='$date'" >> $USR_DATA/web.conf
+
+      fi
+    done
+    ################ detect user domains and add to web.conf ##############
+
+
+
+    ################### Add database config to user ##############
+    mysql_users=$(echo "SELECT user FROM mysql.user;" | mysql mysql | egrep -v 'debian|mysql|root' | tr '\n' ' ')
+    mysql_databases=$(echo "SHOW DATABASES" | mysql mysql | egrep -v 'information_schema|performance_schema|mysql|sys|Database' | tr '\n' ' ');
+
+
+    db_dbs="${mysql_databases}Quit"
+    #items=("Item 1" "Item 2" "Item 3")
+    db_users="${mysql_users}Cancel"
+
+    echo "Add database config to user $user"
+
+    PS3="Select DB:"
+    select db_answer in $db_dbs
+    do
+      for db_item in $db_dbs; do
+        if [[ $db_answer == "Quit" ]]; then
+          db_answer=""
+          break 2
+        fi
+        if [[ $db_item == $db_answer ]]; then
+
+          PS3="Select DB_USER:"
+          select db_user_answer in $db_users; do
+            for db_user_item in $db_users; do
+
+              if [[ $db_user_answer == "Cancel" ]]; then
+                db_user_answer=""
+                PS3="Select DB:"
+                break 2
+              fi
+
+              if [[ $db_user_item == $db_user_answer ]]; then
+                PS3="Select DB:"
+                break 2
+              fi
+            done
+          done
+
+          if [ -n "$db_user_answer" ] && [ -n "$db_answer" ]; then
+            increase_user_value "$user" '$U_DATABASES'
+            # Adding db to db conf
+            str="DB='$db_answer' DBUSER='$db_user_answer'"
+            str="$str TIME='$time'"
+            str="$str DATE='$date'"
+            echo "$str" >> $USR_DATA/db.conf
+            chmod 660 $USR_DATA/db.conf
+          fi
+        fi
+      done
+    done
+    ################### Add database config to user ##############
+
+
+  fi
+done
+
