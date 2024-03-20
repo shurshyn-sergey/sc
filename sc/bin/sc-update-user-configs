@@ -55,8 +55,8 @@ chmod 660 $USR_DATA/user.conf
 
         # Adding domain in web.conf
 echo "DOMAIN='$domain'\
-PHP_VERSION='$php_version'\
-TIME='$time' DATE='$date'" >> $USR_DATA/web.conf
+ PHP_VERSION='$php_version'\
+ TIME='$time' DATE='$date'" >> $USR_DATA/web.conf
 
       fi
     done

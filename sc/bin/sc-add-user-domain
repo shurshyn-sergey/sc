@@ -59,10 +59,10 @@ if [ ! -d "$log_dir" ]; then
   mkdir -p $log_dir
 fi
 
-if [ ! -f "$log_dir""$domain".log ];then 
+if [ ! -f "$log_dir""$domain".log ];then
 	touch "$log_dir""$domain".log
 fi
-if [ ! -f "$log_dir""$domain".error.log ];then 
+if [ ! -f "$log_dir""$domain".error.log ];then
 	touch "$log_dir""$domain".error.log
 fi
 
@@ -123,9 +123,9 @@ if [ -z "$is_domain" ];then
   increase_user_value "$user" '$U_WEB_DOMAINS'
 
   # Adding domain in web.conf
-  echo "DOMAIN='$domain'\
-   PHP_VERSION='$php_version'\
-   TIME='$time' DATE='$date'" >> $USER_DATA/web.conf
+echo "DOMAIN='$domain'\
+ PHP_VERSION='$php_version'\
+ TIME='$time' DATE='$date'" >> $USER_DATA/web.conf
    else
      update_object_value 'web' 'DOMAIN' "$domain" '$PHP_VERSION' "$php_version"
 fi
