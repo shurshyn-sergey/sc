@@ -1,18 +1,29 @@
 #!/bin/bash
 
-source /usr/local/sc/config
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
 
+# Argument definition
 user=$1
-
 user_str=$(grep "^$user:" /etc/passwd )
-if [ -z "$user_str" ]; then
-    echo "User $user not found"
-    exit
-fi
+mount_dir="$(echo $user_str |cut -f 6 -d :)"
+
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '1' "$#" 'USER'
+is_user_exist "$user"
 
 
-
-
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
 
 #unmount mount point
 mount_str=$(mount | grep "/jail/$user/$user")

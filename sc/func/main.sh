@@ -64,6 +64,13 @@ is_user_exist() {
     fi
 }
 
+is_user_sftp() {
+    is_sftp=$(groups $user | grep sftp-only)
+    if [ ! -z "$is_sftp" ]; then
+        check_result $E_FORBIDEN "user $user is already sftp-only"
+    fi
+}
+
 increase_user_value() {
     key="${2//$}"
     factor="${3-1}"

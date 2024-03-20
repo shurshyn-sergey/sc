@@ -1,18 +1,32 @@
 #!/bin/bash
 
-source /usr/local/sc/config
-user=$1
-mount_dir=$2
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
 
+# Argument definition
+user=$1
 user_str=$(grep "^$user:" /etc/passwd )
 if [ -z "$user_str" ]; then
 	    exit
 fi
+mount_dir="$(echo $user_str |cut -f 6 -d :)"
 
-if [ -z "$moun_dir" ]; then
-  # Defining user homedir
-  mount_dir="$(echo $user_str |cut -f 6 -d :)"
-fi
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '1' "$#" 'USER'
+is_user_exist "$user"
+
+
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
 
 if [ ! -z "$user" ]; then
 	if [ -z "$(mount |grep /jail/$user/$user)" ]; then

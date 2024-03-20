@@ -1,15 +1,27 @@
 #!/bin/bash
 
-source /usr/local/sc/config
+#----------------------------------------------------------#
+#                    Variable&Function                     #
+#----------------------------------------------------------#
 
+# Argument definition
 user=$1
-mount_dir=$2
 
-user_str=$(grep "^$user:" /etc/passwd )
-if [ -z "$user_str" ]; then
-    echo "User $user not found"
-    exit
-fi
+# Includes
+source "/usr/local/sc/config"
+source "$sc/func/main.sh"
+
+#----------------------------------------------------------#
+#                    Verifications                         #
+#----------------------------------------------------------#
+
+check_args '1' "$#" 'USER'
+is_user_exist "$user"
+is_user_sftp "$user"
+
+#----------------------------------------------------------#
+#                       Action                             #
+#----------------------------------------------------------#
 
 
 # Defining user homedir
@@ -32,7 +44,6 @@ if [ ! -d "/jail/$user/$user" ]; then
 
 	# And now it can be assigned to the user.
 	#usermod -d /$user $user
-
 fi
 
 # Adding user to sftp group
@@ -41,6 +52,5 @@ if [ -z "$is_sftp" ]; then
   usermod -a -G sftp-only $user
 fi
 
-
 # Mouting home directory
-"$BIN"sc-add-user-sftp-mount $user $mount_dir
+"$BIN"sc-add-user-sftp-mount $user
