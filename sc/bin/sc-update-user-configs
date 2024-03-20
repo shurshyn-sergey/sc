@@ -54,9 +54,9 @@ chmod 660 $USR_DATA/user.conf
         increase_user_value "$user" '$U_WEB_DOMAINS'
 
         # Adding domain in web.conf
-        echo "DOMAIN='$domain'\
-        PHP_VERSION='$php_version'\
-        TIME='$time' DATE='$date'" >> $USR_DATA/web.conf
+echo "DOMAIN='$domain'\
+PHP_VERSION='$php_version'\
+TIME='$time' DATE='$date'" >> $USR_DATA/web.conf
 
       fi
     done
