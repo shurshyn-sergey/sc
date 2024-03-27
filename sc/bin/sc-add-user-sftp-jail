@@ -17,7 +17,7 @@ source "$sc/func/main.sh"
 
 check_args '1' "$#" 'USER'
 is_user_exist "$user"
-is_user_sftp "$user"
+#is_user_sftp "$user"
 
 #----------------------------------------------------------#
 #                       Action                             #

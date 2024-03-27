@@ -1,12 +1,38 @@
 #!/bin/bash
 
-source /usr/local/sc/config
-
 HOMEDIR=/home
-shells="/bin/sh"
-for user in $(grep "$HOMEDIR" /etc/passwd | cut -f 1 -d:); do
-    is_sftp=$(groups $user | grep sftp-only)
+
+echo "sftp-mount..."
+for user in $(/usr/bin/grep "$HOMEDIR" /etc/passwd | /usr/bin/cut -f 1 -d:); do
+    is_sftp=$(/usr/bin/groups $user | /usr/bin/grep sftp-only)
     if [ -n "$is_sftp" ]; then
-        "$bin_path"sc-add-user-sftp-jail $user
+        echo "User: $user"
+        if [ ! -z "$user" ]; then
+                user_str=$(/usr/bin/grep "^$user:" /etc/passwd )
+                if [ -z "$user_str" ]; then
+                      echo "Error: User not found"
+                      exit
+                fi
+                mount_dir="$(echo $user_str | /usr/bin/cut -f 6 -d :)"
+                echo "$mount_dir"
+                check=$(/usr/bin/mount | /usr/bin/grep /jail/$user/$user)
+                echo "$check"
+                if [ -z "$check" ]; then
+                             echo "mounting $mount_dir to /jail/$user/$user/"
+                            /usr/bin/mount -o bind $mount_dir /jail/$user/$user/
+                            echo "Done!"
+                fi
+        fi
     fi
 done
+exit 0
+
+
+#source /usr/local/sc/config
+
+#for user in $(grep "$HOMEDIR" /etc/passwd | cut -f 1 -d:); do
+#    is_sftp=$(groups $user | grep sftp-only)
+#    if [ -n "$is_sftp" ]; then
+#        "$bin_path"sc-add-user-sftp-jail $user
+#    fi
+#done
