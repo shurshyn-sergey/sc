@@ -8,8 +8,7 @@
 user=$1
 database="$user"_"$2"
 dbuser="$user"_"$3"
-password=$4
-show_password=""
+generate_password=$4
 
 
 # Includes
@@ -29,9 +28,10 @@ is_object_new 'db' 'DB' "$database"
 #                       Action                             #
 #----------------------------------------------------------#
 
+password=$(passwording "$generate_password")
+
 if [ -z "$password" ]; then
-  password=$(generate_password)
-  show_password=1
+  check_result $E_PASSWORD "Password"
 fi
 
 
@@ -70,6 +70,6 @@ chmod 660 $USER_DATA/db.conf
 
 echo "Done!"
 
-if [ ! -z "$show_password" ]; then
+if [ ! -z "$generate_password" ]; then
   echo "Password:$password"
 fi

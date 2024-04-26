@@ -6,8 +6,7 @@
 
 # Argument definition
 user=$1
-password=$2
-show_password=""
+generate_password=$2
 
 # Includes
 source "/usr/local/sc/config"
@@ -17,12 +16,13 @@ source "$sc/func/main.sh"
 #                    Verifications                         #
 #----------------------------------------------------------#
 
-check_args '1' "$#" 'USER [PASSWORD]'
+check_args '1' "$#" 'USER [GENERAETE_PASSWORD]'
 is_user_free "$user"
 
+password=$(passwording "$generate_password")
+
 if [ -z "$password" ]; then
-  password=$(generate_password)
-  show_password=1
+  check_result $E_PASSWORD "Password"
 fi
 
 #----------------------------------------------------------#
@@ -44,7 +44,7 @@ mkdir /home/"$user"/.ssh
 chown "$user":"$user" /home/"$user"/.ssh
 chmod 0700 /home/"$user"/.ssh
 
-if [ ! -z "$show_password" ]; then
+if [ ! -z "$generate_password" ]; then
   echo "Password:$password"
 fi
 

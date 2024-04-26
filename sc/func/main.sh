@@ -18,10 +18,10 @@ generate_password() {
     matrix=$1
     lenght=$2
     if [ -z "$matrix" ]; then
-        matrix=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+        matrix=0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_
     fi
     if [ -z "$lenght" ]; then
-        lenght=10
+        lenght=18
     fi
     i=1
     while [ $i -le $lenght ]; do
@@ -31,9 +31,29 @@ generate_password() {
     echo "$pass"
 }
 
+passwording() {
+    generate_password=$1
+    if [ "$generate_password" == "yes"  ]; then
+      generate_password
+    else
+        echo -n 'Password:'  >&2
+        read -s password
+        echo -n -e '\nRepeat password:'  >&2
+        read -s password1
+        echo -n -e '\n'  >&2
+        if [ -z "$password" ]; then
+            check_result $E_PASSWORD "Password is empty"  >/dev/null
+        fi
+        if [ "$password" != "$password1" ]; then
+            check_result $E_PASSWORD "Password mismatch" >/dev/null
+        fi
+      echo "$password"
+    fi
+}
+
 check_result() {
     if [ $1 -ne 0 ]; then
-        echo "Error: $2"
+        echo "Error: $2" >&2
         if [ ! -z "$3" ]; then
             exit $3
         else
