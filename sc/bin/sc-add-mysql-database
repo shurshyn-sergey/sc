@@ -6,8 +6,8 @@
 
 # Argument definition
 user=$1
-database="$user"_"$2"
-dbuser="$user"_"$3"
+database="$2"
+dbuser="$3"
 generate_password=$4
 
 
